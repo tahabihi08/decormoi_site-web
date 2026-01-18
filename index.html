@@ -27,6 +27,27 @@
     <link rel="stylesheet" href="assets/css/animate.css">
     <link rel="stylesheet"href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
   </head>
+	
+	<!-- Lien admin invisible : apparaît après 3 clics dans le coin -->
+<script>
+let clickCount = 0;
+
+// Quand tu cliques dans le coin inférieur droit
+document.body.addEventListener('click', (e) => {
+  // Zone : 100px x 100px dans le coin inférieur droit
+  if(e.clientX > window.innerWidth - 100 && e.clientY > window.innerHeight - 100){
+    clickCount++;
+    if(clickCount === 3){
+      // Redirection vers le panel admin
+      window.location.href = 'admin/login.html';
+    }
+  } else {
+    // Si tu cliques ailleurs, réinitialiser le compteur
+    clickCount = 0;
+  }
+});
+</script>
+
 
 <body>
 
@@ -274,5 +295,6 @@
 </body>
 
 </html>
+
 
 
