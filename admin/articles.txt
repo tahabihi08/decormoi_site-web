@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gérer les Articles - DecorMoi Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding:20px; background:#f5f5f5; }
+    h1 { color:#333; }
+    table { width:100%; border-collapse: collapse; margin-top:20px; }
+    th, td { border:1px solid #ccc; padding:10px; text-align:left; }
+    th { background:#eee; }
+    button { padding:5px 10px; margin-right:5px; cursor:pointer; }
+    #addArticleForm input, #addArticleForm textarea { width:100%; margin:5px 0; padding:5px; }
+    #addArticleForm button { width:auto; }
+  </style>
+</head>
+<body>
+  <h1>Gestion des Articles</h1>
+  <button onclick="window.location.href='dashboard.html'">← Retour Dashboard</button>
+
+  <h2>Ajouter un nouvel article</h2>
+  <form id="addArticleForm">
+    <input type="text" id="title" placeholder="Titre de l'article" required>
+    <input type="text" id="slug" placeholder="Slug (ex: mon-article)" required>
+    <textarea id="content" placeholder="Contenu de l'article"></textarea>
+    <button type="submit">Ajouter</button>
+  </form>
+
+  <h2>Articles existants</h2>
+  <table id="articlesTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Titre</th>
+        <th>Slug</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const supabaseUrl = "sb_publishable_Tmh4tMFfLhSGt_5oSV_6Eg_dOuBKxZL";
+    const supabaseKey = "sb_secret_b_DagUO_3Xd6Te9_nz_9VA_rqhT2Ywb";
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function checkAuth() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "login.html";
+    }
+    checkAuth();
+
+    const articlesTable = document.querySelector('#articlesTable tbody');
+
+    // Charger les articles
+    async function loadArticles() {
+      const { data, error } = await supabase.from('articles').select('*').order('id', { ascending: true });
+      articlesTable.innerHTML = '';
+      if (error) return alert(error.message);
+      data.forEach(article => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${article.id}</td>
+          <td>${article.title}</td>
+          <td>${article.slug}</td>
+          <td>
+            <button onclick="editArticle(${article.id}, '${article.title}', '${article.slug}', '${encodeURIComponent(article.content)}')">Modifier</button>
+            <button onclick="deleteArticle(${article.id})">Supprimer</button>
+          </td>
+        `;
+        articlesTable.appendChild(row);
+      });
+    }
+
+    loadArticles();
+
+    // Ajouter un article
+    document.getElementById('addArticleForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const slug = document.getElementById('slug').value;
+      const content = document.getElementById('content').value;
+
+      const { data, error } = await supabase.from('articles').insert([{ title, slug, content }]);
+      if (error) alert(error.message);
+      else {
+        document.getElementById('addArticleForm').reset();
+        loadArticles();
+      }
+    });
+
+    // Supprimer un article
+    async function deleteArticle(id) {
+      if (!confirm('Voulez-vous vraiment supprimer cet article ?')) return;
+      const { error } = await supabase.from('articles').delete().eq('id', id);
+      if (error) alert(error.message);
+      else loadArticles();
+    }
+
+    // Modifier un article
+    async function editArticle(id, title, slug, content) {
+      const newTitle = prompt('Nouveau titre :', title);
+      const newSlug = prompt('Nouveau slug :', slug);
+      const newContent = prompt('Nouveau contenu :', decodeURIComponent(content));
+
+      if (newTitle && newSlug) {
+        const { error } = await supabase.from('articles').update({ title: newTitle, slug: newSlug, content: newContent }).eq('id', id);
+        if (error) alert(error.message);
+        else loadArticles();
+      }
+    }
+  </script>
+</body>
+</html>
