@@ -24,7 +24,9 @@
         // ================================
         const supabaseUrl = 'https://fqujvrklipnufaidxqhb.supabase.co';
         const supabaseKey = 'sb_secret_b_DagUO_3Xd6Te9_nz_9VA_rqhT2Ywb';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        // Correction ici : supabase.createClient doit être appelé sur la variable globale 'supabase'
+        // qui est exposée par la librairie chargée via le CDN.
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey); 
 
         // ================================
         // LOGIN ADMIN
@@ -47,9 +49,11 @@
             }
 
             // Vérification rôle admin
+            // Note : Il est crucial de s'assurer que le champ user_metadata.role est bien défini dans Supabase.
+            // Une vérification de sécurité côté serveur est également fortement recommandée pour ce type de rôle.
             if (!data.user || data.user.user_metadata.role !== 'admin') {
                 alert("Accès refusé : ce compte n'est pas admin");
-                await supabase.auth.signOut();
+                await supabase.auth.signOut(); // Déconnexion en cas de rôle non valide
                 return;
             }
 
