@@ -5,37 +5,65 @@
 <title>Login Admin - DecorMoi</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script>
-const supabaseUrl = 'https://fqujvrklipnufaidxqhb.supabase.co';
-const supabaseKey = 'sb_secret_b_DagUO_3Xd6Te9_nz_9VA_rqhT2Ywb';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-async function loginAdmin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if(error) { alert(error.message); return; }
-
-    if(!data.user || data.user.user_metadata.role !== 'admin') {
-        alert("Accès refusé : ce compte n'est pas admin");
-        await supabase.auth.signOut();
-        return;
-    }
-
-    window.location.href = "index.html";
-}
-</script>
 </head>
 <body>
-<h1>Login Admin DecorMoi</h1>
-<label>Email</label>
-<input type="email" id="email">
-<label>Mot de passe</label>
-<input type="password" id="password">
-<button onclick="loginAdmin()">Se connecter</button>
+    <div class="login-container">
+        <h1>Login Admin DecorMoi</h1>
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="votre email">
+        
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" placeholder="votre mot de passe">
+        
+        <button id="btnLogin">Se connecter</button>
+    </div>
+
+    <script>
+        // ================================
+        // CONFIGURATION SUPABASE
+        // ================================
+        const supabaseUrl = 'https://fqujvrklipnufaidxqhb.supabase.co';
+        const supabaseKey = 'sb_secret_b_DagUO_3Xd6Te9_nz_9VA_rqhT2Ywb';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // ================================
+        // LOGIN ADMIN
+        // ================================
+        async function loginAdmin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert("Veuillez entrer votre email et mot de passe.");
+                return;
+            }
+
+            // Connexion Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert("Erreur login : " + error.message);
+                return;
+            }
+
+            // Vérification rôle admin
+            if (!data.user || data.user.user_metadata.role !== 'admin') {
+                alert("Accès refusé : ce compte n'est pas admin");
+                await supabase.auth.signOut();
+                return;
+            }
+
+            // Redirection vers le panel admin
+            window.location.href = "index.html";
+        }
+
+        // ================================
+        // LIAISON DU BOUTON
+        // ================================
+        document.getElementById('btnLogin').addEventListener('click', loginAdmin);
+    </script>
 </body>
 </html>
+
 
 
