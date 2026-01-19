@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Panel Admin - DecorMoi</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header>
+    <h1>Panel Admin DecorMoi</h1>
+    <nav>
+        <button onclick="showTab('pages')">Pages</button>
+        <button onclick="showTab('sections')">Sections</button>
+        <button onclick="showTab('articles')">Articles</button>
+        <button onclick="showTab('media')">Médias</button>
+        <button onclick="showTab('settings')">Réglages</button>
+        <button onclick="logout()">Se déconnecter</button>
+    </nav>
+</header>
+<main id="content">
+    <h2>Bienvenue dans le panel admin DecorMoi</h2>
+    <p>Sélectionnez un onglet pour commencer à gérer votre site.</p>
+</main>
+</body>
+</html>
